@@ -9,11 +9,15 @@ import {
   Alert,
   TextInput,
   TouchableOpacity,
+  
 } from 'react-native';
 import {black} from 'react-native-paper/lib/typescript/styles/colors';
 import Logo from '../Logo';
 import database from '@react-native-firebase/database';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+
 
 const SingleProduct = ({route, navigation}) => {
   const [data, setData] = useState({});
@@ -28,7 +32,26 @@ const SingleProduct = ({route, navigation}) => {
         console.log('This is my snapshot value ', snapshot.val());
       });
   }, []);
-
+  
+  const addItemToCart = async () =>{
+    let mobile  =  await AsyncStorage.getItem('Mobile')
+    // database()
+    //   .ref(`/CMSO/Users/${mobile}/Cart`)
+    //   .on('value', snapshot => {
+    //     // setData(snapshot.val());
+    //     console.log('This is my car tarray ', snapshot.val());
+    //   });
+    let pathId = uuid.v4();
+    database()
+      .ref(`/CMSO/Users/${mobile}/Cart/${pathId}`)
+      .update({
+        path: route?.params?.subCategory, 
+      })
+      .then(() => {
+        console.log('Data updated.')
+        Alert.alert("Success", "Your item added to cart")
+      });
+  }
   return (
     <View style={{flex: 1}}>
       <View style={{height: 50, backgroundColor: 'white'}}>
@@ -113,7 +136,7 @@ const SingleProduct = ({route, navigation}) => {
 
         <TouchableOpacity
           style={styles.cartButton}
-          onPress={() => navigation.navigate('Cart')}>
+          onPress={addItemToCart}>
           <Text style={styles.cartText}>ADD TO CART</Text>
         </TouchableOpacity>
       </View>

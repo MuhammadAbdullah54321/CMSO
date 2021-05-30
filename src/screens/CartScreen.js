@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState, } from 'react';
 import {
   Text,
   View,
@@ -15,27 +15,48 @@ var {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Logo from '../screens/Logo';
+import database from '@react-native-firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Cart = ({navigation}) => {
-  return (
-    <View style={styles.container}>
-      <Logo/>
-      <Text style={styles.header}> Shopping Cart </Text>
-      <View style={{flex: 1}}>
-        
-        
-        <ScrollView>
-        
-        <View style={styles.container1}>
+  const [data, setData] = useState()
+  const [totalPrice, setTotalPrice] = useState(0)
+
+  useEffect(() =>{
+    fetchCartData()
+  }, [])
+
+  const fetchCartData = async () =>{
+    let mobile  =  await AsyncStorage.getItem('Mobile')
+    database()
+      .ref(`/CMSO/Users/${mobile}/Cart`)
+      .on('value', snapshot => {
+        setData(snapshot.val());
+        console.log('This is my cart values', snapshot.val());
+      });
+  }
+  const SingleCartItem = ({path}) =>{
+      const [singleData, setSingleData] = useState()
+      useEffect(()=>{
+        database()
+          .ref(`CMSO/Product Categories/${path}`)
+          .on('value', snapshot => {
+            setSingleData(snapshot.val());
+            console.log('This is my single data', snapshot.val());
+          });
+      }, [])
+    return (
+      <View style={styles.container1}>
           <Image
             resizeMode={'contain'}
             style={styles.image}
-            source={require('../assets/PC9.jpg')}
+            source={{uri: singleData?.Image}}
           />
           <View style={styles.container2}>
             <View>
               <Text style={styles.productName}>
-                Hardware Product
+                {singleData?.Name}
               </Text>
               <Text style={{fontSize:17,paddingTop:4}}>Qty</Text>
             </View>
@@ -43,7 +64,7 @@ const Cart = ({navigation}) => {
               style={styles.container3}>
               <Text
                 style={styles.price}>
-                Rs.6500 
+                Rs.{singleData?.Price}
               </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <TouchableOpacity>
@@ -53,10 +74,20 @@ const Cart = ({navigation}) => {
             </View>
           </View>
         </View>
-
-
+    )
+  }
+  return (
+    <View style={styles.container}>
+      <Logo/>
+      <Text style={styles.header}> Shopping Cart </Text>
+      <View style={{flex: 1}}>
         
-
+        
+        <ScrollView>
+        {data && Object.keys(data).map((item, index) =>{
+          return <SingleCartItem path={data[item].path}/>
+        })
+        }
         
         <View style={{height:10}}/>
         <View style={{justifyContent:'space-between',flexDirection:'row'}}>
