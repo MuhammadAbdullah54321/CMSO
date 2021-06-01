@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  ActivityIndicator
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 var {width} = Dimensions.get('window');
@@ -20,8 +21,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Cart = ({navigation}) => {
-  const [data, setData] = useState()
+  const [data, setData] = useState({})
   const [totalPrice, setTotalPrice] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() =>{
     fetchCartData()
@@ -33,19 +35,34 @@ const Cart = ({navigation}) => {
       .ref(`/CMSO/Users/${mobile}/Cart`)
       .on('value', snapshot => {
         setData(snapshot.val());
+        let temp = 0
+        snapshot.val()!= null && Object.keys(snapshot.val()).map((item, index) =>{
+          console.log("this is price: ",snapshot.val()[item].price )
+          console.log("this is the quantitiy", snapshot.val()[item].quantity)
+          temp = temp + parseInt(snapshot.val()[item].price) * parseInt( snapshot.val()[item].quantity)
+        }) 
+        console.log("this is temp total", temp)
+        setTotalPrice(temp)
         console.log('This is my cart values', snapshot.val());
+        setLoading(false )
       });
   }
-  const SingleCartItem = ({path}) =>{
+
+  const SingleCartItem = ({path, qty}) =>{
       const [singleData, setSingleData] = useState()
       useEffect(()=>{
+        fetchSingleCartItem()
+      }, [])
+
+      const fetchSingleCartItem = () =>{
         database()
           .ref(`CMSO/Product Categories/${path}`)
           .on('value', snapshot => {
             setSingleData(snapshot.val());
+            
             console.log('This is my single data', snapshot.val());
           });
-      }, [])
+      }
     return (
       <View style={styles.container1}>
           <Image
@@ -58,13 +75,13 @@ const Cart = ({navigation}) => {
               <Text style={styles.productName}>
                 {singleData?.Name}
               </Text>
-              <Text style={{fontSize:17,paddingTop:4}}>Qty</Text>
+              <Text style={{fontSize:17,paddingTop:4}}>Qty: {qty}</Text>
             </View>
             <View
               style={styles.container3}>
               <Text
                 style={styles.price}>
-                Rs.{singleData?.Price}
+                Rs.{singleData?.Price*qty}
               </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <TouchableOpacity>
@@ -76,6 +93,7 @@ const Cart = ({navigation}) => {
         </View>
     )
   }
+
   return (
     <View style={styles.container}>
       <Logo/>
@@ -83,9 +101,13 @@ const Cart = ({navigation}) => {
       <View style={{flex: 1}}>
         
         
-        <ScrollView>
+        {loading 
+        ?
+        <ActivityIndicator color="blue" size={30}/>
+        :
+          <ScrollView>
         {data && Object.keys(data).map((item, index) =>{
-          return <SingleCartItem path={data[item].path}/>
+          return <SingleCartItem key={index} path={data[item].path} qty={data[item].quantity}/>
         })
         }
         
@@ -101,11 +123,11 @@ const Cart = ({navigation}) => {
           <Text style={styles.subTotal}>0</Text>
         </View>
         <View style={styles.totalSection}>
-          <Text style={styles.totalText}>Total</Text>
+          <Text style={styles.totalText}>Total-</Text>
           <View style={styles.divider}/>
-          <Text style={styles.subTotal}>12000</Text>
+          <Text style={styles.subTotal}>{totalPrice}</Text>
         </View>
-      </ScrollView>
+      </ScrollView>}
 
       </View>
     

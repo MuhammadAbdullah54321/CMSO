@@ -21,6 +21,7 @@ import uuid from 'react-native-uuid';
 
 const SingleProduct = ({route, navigation}) => {
   const [data, setData] = useState({});
+  const [quantity, setQuantity] = useState(1)
 
   useEffect(async () => {
     console.log('HERE I AM');
@@ -46,11 +47,25 @@ const SingleProduct = ({route, navigation}) => {
       .ref(`/CMSO/Users/${mobile}/Cart/${pathId}`)
       .update({
         path: route?.params?.subCategory, 
+        quantity: quantity,
+        price: data.Price
       })
       .then(() => {
         console.log('Data updated.')
         Alert.alert("Success", "Your item added to cart")
       });
+  }
+  const increaseQuantity = () =>{
+    let newQuantity = quantity+1
+    setQuantity(newQuantity)
+  }
+  const decreaseQuantity = () =>{
+    let newQuantity = quantity
+    if(quantity>1){
+      newQuantity = quantity-1
+    }
+    
+    setQuantity(newQuantity)
   }
   return (
     <View style={{flex: 1}}>
@@ -126,11 +141,11 @@ const SingleProduct = ({route, navigation}) => {
           justifyContent: 'center',
         }}>
         <Text style={{fontSize: 16, paddingHorizontal: 4}}>Quantity</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={decreaseQuantity}>
           <Icon name="ios-remove-circle" size={30} color={'black'} />
         </TouchableOpacity>
-        <Text style={{paddingHorizontal: 8, fontWeight: 'bold'}}>5</Text>
-        <TouchableOpacity>
+        <Text style={{paddingHorizontal: 8, fontWeight: 'bold'}}>{quantity}</Text>
+        <TouchableOpacity onPress={increaseQuantity}>
           <Icon name="ios-add-circle" size={30} color={'black'} />
         </TouchableOpacity>
 
