@@ -24,6 +24,7 @@ const Cart = ({navigation}) => {
   const [data, setData] = useState({})
   const [totalPrice, setTotalPrice] = useState(0)
   const [loading, setLoading] = useState(true)
+  let mobile = AsyncStorage.getItem('Mobile')
 
   useEffect(() =>{
     fetchCartData()
@@ -37,32 +38,42 @@ const Cart = ({navigation}) => {
         setData(snapshot.val());
         let temp = 0
         snapshot.val()!= null && Object.keys(snapshot.val()).map((item, index) =>{
-          console.log("this is price: ",snapshot.val()[item].price )
-          console.log("this is the quantitiy", snapshot.val()[item].quantity)
+          console.log("this is item ", item)
+          // console.log("this is price: ",snapshot.val()[item].price )
+          // console.log("this is the quantitiy", snapshot.val()[item].quantity)
           temp = temp + parseInt(snapshot.val()[item].price) * parseInt( snapshot.val()[item].quantity)
         }) 
-        console.log("this is temp total", temp)
+        // console.log("this is temp total", temp)
         setTotalPrice(temp)
-        console.log('This is my cart values', snapshot.val());
+        // console.log('This is my cart values', snapshot.val());
         setLoading(false )
       });
   }
+  
 
-  const SingleCartItem = ({path, qty}) =>{
-      const [singleData, setSingleData] = useState()
-      useEffect(()=>{
-        fetchSingleCartItem()
-      }, [])
+  const SingleCartItem = ({path, qty, item}) =>{
+    const [singleData, setSingleData] = useState()
+    useEffect(()=>{
+      fetchSingleCartItem()
+    }, [])
 
-      const fetchSingleCartItem = () =>{
-        database()
-          .ref(`CMSO/Product Categories/${path}`)
-          .on('value', snapshot => {
-            setSingleData(snapshot.val());
-            
-            console.log('This is my single data', snapshot.val());
-          });
-      }
+
+    const deleteCartProduct = async () =>{
+      console.log("deleting item ....")
+      let mobile  =  await AsyncStorage.getItem('Mobile')
+      database().ref(`/CMSO/Users/${mobile}/Cart/${item}`).remove()
+      console.log("deleted successful")
+    }
+
+    const fetchSingleCartItem = () =>{
+      database()
+        .ref(`CMSO/Product Categories/${path}`)
+        .on('value', snapshot => {
+          setSingleData(snapshot.val());
+          
+          console.log('This is my single data', snapshot.val());
+        });
+    }
     return (
       <View style={styles.container1}>
           <Image
@@ -84,7 +95,7 @@ const Cart = ({navigation}) => {
                 Rs.{singleData?.Price*qty}
               </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={deleteCartProduct}>
                   <FeatherAwesomeIcon name="trash-o" size={30} color={'black'} />
                 </TouchableOpacity>
               </View>
@@ -107,7 +118,7 @@ const Cart = ({navigation}) => {
         :
           <ScrollView>
         {data && Object.keys(data).map((item, index) =>{
-          return <SingleCartItem key={index} path={data[item].path} qty={data[item].quantity}/>
+          return <SingleCartItem key={index} item={item} path={data[item].path} qty={data[item].quantity}/>
         })
         }
         

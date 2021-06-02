@@ -9,6 +9,7 @@ import {
   Alert,
   TextInput,
   TouchableOpacity,
+  ToastAndroid
   
 } from 'react-native';
 import {black} from 'react-native-paper/lib/typescript/styles/colors';
@@ -52,7 +53,12 @@ const SingleProduct = ({route, navigation}) => {
       })
       .then(() => {
         console.log('Data updated.')
-        Alert.alert("Success", "Your item added to cart")
+        ToastAndroid.showWithGravity(
+          "Added to cart",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+        // Alert.alert("Success", "Your item added to cart")
       });
   }
   const increaseQuantity = () =>{
