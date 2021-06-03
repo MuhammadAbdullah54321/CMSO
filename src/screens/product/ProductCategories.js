@@ -24,7 +24,7 @@ const ProductCategories = ({navigation}) => {
     <ScrollView>
       <View style={{backgroundColor:'#077b8a'}}>
 
-        <SearchBar />
+        <Logo />
 
         <SwiperImages />
 

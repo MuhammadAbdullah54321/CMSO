@@ -9,12 +9,12 @@ import {
   Alert,
 } from 'react-native';
 import SearchBar from '../../SearchBar';
-
+import Logo from '../../Logo'
 const PSC6 = ({navigation}) => {
   return (
     <ScrollView>
       <View>
-       <SearchBar/>
+       <Logo/>
         <Text
           style={{
             alignSelf: 'center',

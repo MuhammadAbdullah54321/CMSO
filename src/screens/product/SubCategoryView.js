@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import SearchBar from '../SearchBar';
 //import * as firebase from 'firebase';
+import Logo from '../Logo'
 import database from '@react-native-firebase/database';
 
 
@@ -23,7 +24,7 @@ const SubCategoryView = ({route, navigation}) => {
       .ref(`CMSO/Product Categories/${route?.params?.subCategory}`)
       .on('value', snapshot => {
         setData(snapshot.val());
-        console.log('This is my snapshot value ', Object.keys(snapshot.val()));
+        // console.log('This is my snapshot value ', Object.keys(snapshot.val()));
       });
   }, []);
     const renderItem =({item, index})=>{
@@ -60,7 +61,7 @@ const SubCategoryView = ({route, navigation}) => {
      }
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-      <SearchBar />
+      <Logo />
 
       <View style={styles.container}>
         {data !== null &&

@@ -12,12 +12,13 @@ import {
 import SearchBar from '../SearchBar';
 import SwiperImages from '../SwiperImages';
 import ServiceCategoryDetails from '../Services/ServiceCategoryDetails';
+import Logo from '../Logo'
 
 const ServiceCategories = ({navigation}) => {
   return (
     <ScrollView style={styles.container}>
       <View style={{backgroundColor:'#322514'}}>
-        <SearchBar />
+        <Logo />
         <SwiperImages />
 
         <Text
