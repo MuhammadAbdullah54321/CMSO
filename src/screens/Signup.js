@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   TouchableOpacity,
   TextInput,
@@ -9,7 +9,6 @@ import {
   Button,
   Alert,
 } from 'react-native';
-import {useState} from 'react/cjs/react.development';
 import Logo from '../screens/Logo';
 import EntypoIcons from 'react-native-vector-icons/Entypo';
 import login from '../screens/Login';
